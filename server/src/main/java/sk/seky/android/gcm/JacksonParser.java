@@ -1,0 +1,98 @@
+package sk.seky.android.gcm;
+
+import com.google.api.client.json.JsonParser;
+import com.google.api.client.json.JsonToken;
+
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+
+/**
+ * Created by lsekerak on 3. 4. 2016.
+ */
+public class JacksonParser extends JsonParser {
+
+    private final com.fasterxml.jackson.core.JsonParser parser;
+    private final JacksonFactory factory;
+
+    JacksonParser(JacksonFactory factory, com.fasterxml.jackson.core.JsonParser parser) {
+        this.factory = factory;
+        this.parser = parser;
+    }
+
+    @Override
+    public JacksonFactory getFactory() {
+        return factory;
+    }
+
+    @Override
+    public void close() throws IOException {
+        parser.close();
+    }
+
+    @Override
+    public JsonToken nextToken() throws IOException {
+        return JacksonFactory.convert(parser.nextToken());
+    }
+
+    @Override
+    public String getCurrentName() throws IOException {
+        return parser.getCurrentName();
+    }
+
+    @Override
+    public JsonToken getCurrentToken() {
+        return JacksonFactory.convert(parser.getCurrentToken());
+    }
+
+    @Override
+    public JsonParser skipChildren() throws IOException {
+        parser.skipChildren();
+        return this;
+    }
+
+    @Override
+    public String getText() throws IOException {
+        return parser.getText();
+    }
+
+    @Override
+    public byte getByteValue() throws IOException {
+        return parser.getByteValue();
+    }
+
+    @Override
+    public float getFloatValue() throws IOException {
+        return parser.getFloatValue();
+    }
+
+    @Override
+    public int getIntValue() throws IOException {
+        return parser.getIntValue();
+    }
+
+    @Override
+    public short getShortValue() throws IOException {
+        return parser.getShortValue();
+    }
+
+    @Override
+    public BigInteger getBigIntegerValue() throws IOException {
+        return parser.getBigIntegerValue();
+    }
+
+    @Override
+    public BigDecimal getDecimalValue() throws IOException {
+        return parser.getDecimalValue();
+    }
+
+    @Override
+    public double getDoubleValue() throws IOException {
+        return parser.getDoubleValue();
+    }
+
+    @Override
+    public long getLongValue() throws IOException {
+        return parser.getLongValue();
+    }
+}

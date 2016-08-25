@@ -1,0 +1,67 @@
+plugins {
+    id 'java' // or 'groovy' Must be explicitly applied
+    id 'com.github.johnrengelman.shadow' version '1.2.3'
+    id 'maven-publish'
+    id "com.jfrog.bintray" version "1.7"
+}
+
+sourceCompatibility = 1.7
+version = '1.0'
+group = 'sk.seky.android.gcm'
+
+apply plugin: 'com.jfrog.bintray'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile 'com.fasterxml.jackson.core:jackson-core:2.7.3'
+    compile('com.fasterxml.jackson.core:jackson-databind:2.7.3') {
+        exclude group: 'com.fasterxml.jackson.core', module: 'jackson-core'
+    }
+    compile('com.fasterxml.jackson.jaxrs:jackson-jaxrs-json-provider:2.7.3') {
+        exclude group: 'com.fasterxml.jackson.core', module: 'jackson-core'
+        exclude group: 'com.fasterxml.jackson.core', module: 'jackson-databind'
+    }
+    compile('com.fasterxml.jackson.datatype:jackson-datatype-joda:2.7.3')
+
+    compile(group: 'ch.qos.logback', name: 'logback-classic', version: '1.1.7')
+    compile(group: 'com.google.http-client', name: 'google-http-client-appengine', version: '1.21.0')
+}
+
+shadowJar {
+    baseName = 'gcm-server'
+    classifier = ''
+}
+
+publishing {
+    publications {
+        shadow(MavenPublication) {
+            from components.shadow
+            artifactId = 'gcm-server'
+        }
+    }
+}
+
+bintray {
+    user = project.hasProperty('bintrayUser') ? project.property('bintrayUser') : System.getenv('BINTRAY_USER')
+    key = project.hasProperty('bintrayApiKey') ? project.property('bintrayApiKey') : System.getenv('BINTRAY_API_KEY')
+    pkg {
+        repo = 'sekys'
+        name = 'sk.seky.android.gcm'
+
+        version {
+            name = '1.0.0'
+            desc = 'GCM send data'
+            released = new Date()
+            vcsTag = '1.0.0'
+        }
+
+        licenses = ['Apache-2.0']
+        vcsUrl = 'https://github.com/sekys.git'
+        websiteUrl = 'https://github.com/sekys'
+    }
+    configurations = ['archives']
+    //publications = ['shadow']
+}

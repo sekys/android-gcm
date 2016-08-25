@@ -1,0 +1,122 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:2.2.0-beta1'
+        classpath 'com.google.gms:google-services:3.0.0'
+        // http://code.tutsplus.com/tutorials/creating-and-publishing-an-android-library--cms-24582
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7'
+        classpath "com.github.dcendents:android-maven-gradle-plugin:1.5"
+    }
+}
+
+apply plugin: 'com.android.library'
+apply plugin: 'com.jfrog.bintray'
+apply plugin: 'com.github.dcendents.android-maven'
+
+sourceCompatibility = JavaVersion.VERSION_1_8
+group = 'sk.seky.android.gcm'
+version = '1.0.0'
+
+repositories {
+    mavenCentral()
+}
+
+// Still unsupported, see http://issues.gradle.org/browse/GRADLE-784
+// Like this, it won't appear at all in the POM
+configurations {
+    provided
+}
+
+android {
+    compileSdkVersion 23
+    buildToolsVersion "23.0.2"
+
+    defaultConfig {
+        minSdkVersion 21
+        targetSdkVersion 21
+        versionCode 1
+        versionName "1.0"
+    }
+    lintOptions {
+        quiet true
+        abortOnError false
+        checkReleaseBuilds false
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    buildTypes {
+        debug {
+            debuggable true
+            testCoverageEnabled false
+            minifyEnabled false
+            zipAlignEnabled false
+        }
+    }
+}
+
+dependencies {
+    provided 'com.google.android.gms:play-services-gcm:8.4.0'
+    provided 'com.google.android:android:4.1.1.4'
+
+    compile 'org.slf4j:slf4j-api:1.7.21'
+    compile 'com.github.tony19:logback-android-core:1.1.1-5'
+    compile('com.github.tony19:logback-android-classic:1.1.1-5') {
+        // workaround issue #73
+        exclude group: 'com.google.android', module: 'android'
+    }
+
+    // Jackson
+    compile 'com.fasterxml.jackson.core:jackson-core:2.7.2'
+    compile('com.fasterxml.jackson.core:jackson-databind:2.7.2') {
+        exclude group: 'com.fasterxml.jackson.core', module: 'jackson-core'
+    }
+}
+
+task generateSourcesJar(type: Jar) {
+    from android.sourceSets.main.java.srcDirs
+    classifier 'sources'
+}
+
+task generateJavadocs(type: Javadoc) {
+    source = android.sourceSets.main.java.srcDirs
+    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+}
+
+task generateJavadocsJar(type: Jar) {
+    from generateJavadocs.destinationDir
+    classifier 'javadoc'
+}
+
+generateJavadocsJar.dependsOn generateJavadocs
+
+artifacts {
+    //archives generateJavaDocsJar
+    //archives generateSourcesJar
+}
+
+bintray {
+    user = project.hasProperty('bintrayUser') ? project.property('bintrayUser') : System.getenv('BINTRAY_USER')
+    key = project.hasProperty('bintrayApiKey') ? project.property('bintrayApiKey') : System.getenv('BINTRAY_API_KEY')
+    pkg {
+        repo = 'sekys'
+        name = 'sk.seky.android.gcm'
+
+        version {
+            name = '1.0.0'
+            desc = 'GCM send data'
+            released = new Date()
+            vcsTag = '1.0.0'
+        }
+
+        licenses = ['Apache-2.0']
+        vcsUrl = 'https://github.com/sekys.git'
+        websiteUrl = 'https://github.com/sekys'
+    }
+    configurations = ['archives']
+}
+
+//apply plugin: 'com.google.gms.google-services'
