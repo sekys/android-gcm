@@ -1,9 +1,8 @@
 package sk.seky.android.gcm;
 
 import android.content.Intent;
-import com.google.android.gms.iid.InstanceIDListenerService;
 
-public class MyInstanceIDListenerService extends InstanceIDListenerService {
+public class InstanceIDListenerService extends com.google.android.gms.iid.InstanceIDListenerService {
 
     @Override
     public void onTokenRefresh() {

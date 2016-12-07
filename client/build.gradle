@@ -1,9 +1,10 @@
+
 buildscript {
     repositories {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.2.0-beta1'
+        classpath 'com.android.tools.build:gradle:2.2.0'
         classpath 'com.google.gms:google-services:3.0.0'
         // http://code.tutsplus.com/tutorials/creating-and-publishing-an-android-library--cms-24582
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7'
@@ -14,10 +15,12 @@ buildscript {
 apply plugin: 'com.android.library'
 apply plugin: 'com.jfrog.bintray'
 apply plugin: 'com.github.dcendents.android-maven'
+apply plugin: 'maven-publish'
 
-sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = '1.7'
+sourceCompatibility = '1.7'
 group = 'sk.seky.android.gcm'
-version = '1.0.0'
+version = '1.0'
 
 repositories {
     mavenCentral()
@@ -31,10 +34,10 @@ configurations {
 
 android {
     compileSdkVersion 23
-    buildToolsVersion "23.0.2"
+    buildToolsVersion "23.0.3"
 
     defaultConfig {
-        minSdkVersion 21
+        minSdkVersion 19
         targetSdkVersion 21
         versionCode 1
         versionName "1.0"
@@ -45,8 +48,8 @@ android {
         checkReleaseBuilds false
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
     }
     buildTypes {
         debug {
@@ -76,26 +79,33 @@ dependencies {
     }
 }
 
-task generateSourcesJar(type: Jar) {
+task sourcesJar(type: Jar) {
     from android.sourceSets.main.java.srcDirs
-    classifier 'sources'
+    classifier = 'sources'
 }
 
-task generateJavadocs(type: Javadoc) {
+task javadoc(type: Javadoc) {
     source = android.sourceSets.main.java.srcDirs
     classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
 }
 
-task generateJavadocsJar(type: Jar) {
-    from generateJavadocs.destinationDir
-    classifier 'javadoc'
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+artifacts {
+    archives javadocJar
+    archives sourcesJar
 }
 
-generateJavadocsJar.dependsOn generateJavadocs
-
-artifacts {
-    //archives generateJavaDocsJar
-    //archives generateSourcesJar
+publishing {
+    publications {
+        aar(MavenPublication) {
+            artifactId = 'client'
+            artifact sourcesJar
+            artifact javadocJar
+        }
+    }
 }
 
 bintray {
@@ -106,10 +116,10 @@ bintray {
         name = 'sk.seky.android.gcm'
 
         version {
-            name = '1.0.0'
+            name = '1.0'
             desc = 'GCM send data'
             released = new Date()
-            vcsTag = '1.0.0'
+            vcsTag = '1.0'
         }
 
         licenses = ['Apache-2.0']
@@ -119,4 +129,3 @@ bintray {
     configurations = ['archives']
 }
 
-//apply plugin: 'com.google.gms.google-services'

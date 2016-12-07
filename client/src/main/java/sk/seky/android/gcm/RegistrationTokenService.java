@@ -13,11 +13,10 @@ import org.slf4j.LoggerFactory;
 public class RegistrationTokenService extends IntentService {
     public static final String REGISTRATION_COMPLETE = "registrationComplete";
     private static final Logger LOGGER = LoggerFactory.getLogger(RegistrationTokenService.class);
-    private final String gcmSenderId;
+    private String gcmSenderId;
 
-    public RegistrationTokenService(String gcmSenderId) {
+    public RegistrationTokenService() {
         super(RegistrationTokenService.class.getSimpleName());
-        this.gcmSenderId = gcmSenderId;
     }
 
     @Override
@@ -39,5 +38,13 @@ public class RegistrationTokenService extends IntentService {
         sharedPreferences.edit().putString(GcmService.GCM_TOKEN, token).apply();
         Intent registrationComplete = new Intent(REGISTRATION_COMPLETE);
         LocalBroadcastManager.getInstance(this).sendBroadcast(registrationComplete);
+    }
+
+    public String getGcmSenderId() {
+        return gcmSenderId;
+    }
+
+    public void setGcmSenderId(String gcmSenderId) {
+        this.gcmSenderId = gcmSenderId;
     }
 }

@@ -61,7 +61,7 @@ public class GcmClient {
         objectMapper.writeValue(out, message);
         HttpContent content = new ByteArrayContent("application/javascript", out.toByteArray());
         String value = new String(out.toByteArray(), "UTF-8");
-        LOGGER.debug(value);
+        //LOGGER.debug(value);
 
         HttpRequest request = httpRequestFactory.buildPostRequest(gurl, content);
         request.setHeaders(headers);
